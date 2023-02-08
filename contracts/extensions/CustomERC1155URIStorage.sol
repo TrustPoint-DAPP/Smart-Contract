@@ -61,6 +61,7 @@ abstract contract CustomERC1155URIStorage is CustomERC1155 {
     function _setURI(uint256 tokenId, string memory tokenURI) internal virtual {
         _tokenURIs[tokenId] = tokenURI;
         emit URI(uri(tokenId), tokenId);
+        logger.emitURI(uri(tokenId), tokenId);
     }
 
     /**
