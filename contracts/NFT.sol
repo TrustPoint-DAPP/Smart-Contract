@@ -131,7 +131,6 @@ contract NFT is
         super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
     }
 
-    // TODO: royalty info
     function supportsInterface(bytes4 interfaceId)
         public
         view
