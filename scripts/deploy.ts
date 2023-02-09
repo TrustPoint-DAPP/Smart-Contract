@@ -1,18 +1,33 @@
 import { ethers } from "hardhat";
 
+const royaltyBasisPoints = 50;
+const oneOffFees = 100;
+
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const signers = await ethers.getSigners();
+  const account = await signers[0].getAddress();
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const OrganizationControllerFactory = await ethers.getContractFactory(
+    "OrganizationController"
+  );
+  const DealControllerFactory = await ethers.getContractFactory(
+    "DealController"
+  );
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  const organizationController = await OrganizationControllerFactory.deploy();
+  await organizationController.deployed();
+  console.log(
+    `The organizaiton controller is deployed to ${organizationController.address}`
+  );
 
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  const dealController = await DealControllerFactory.deploy(
+    organizationController.address,
+    account,
+    oneOffFees,
+    royaltyBasisPoints
+  );
+  await dealController.deployed();
+  console.log(`The deal controller is deployed to ${dealController.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
