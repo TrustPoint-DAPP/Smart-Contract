@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./extensions/CustomERC1155Burnable.sol";
 import "./extensions/CustomERC1155Supply.sol";
 import "./extensions/CustomERC1155URIStorage.sol";
@@ -16,7 +17,8 @@ contract NFT is
     Pausable,
     CustomERC1155Burnable,
     CustomERC1155Supply,
-    CustomERC1155URIStorage
+    CustomERC1155URIStorage,
+    ERC2981
 {
     IOrganizationController public organizationController;
     uint256 public orgId;
@@ -46,9 +48,14 @@ contract NFT is
         _;
     }
 
-    function setURI(string calldata tokenURI) public onlyDealMaker {
+    function createNFT(
+        address royaltyReceiver,
+        uint96 royaltyBasisPoints,
+        string calldata tokenURI
+    ) public onlyDealMaker {
         uint256 tokenId = totalTokenIds++;
         _setURI(tokenId, tokenURI);
+        _setTokenRoyalty(tokenId, royaltyReceiver, royaltyBasisPoints);
         logger.emitURI(tokenURI, tokenId);
     }
 
@@ -125,4 +132,13 @@ contract NFT is
     }
 
     // TODO: royalty info
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(CustomERC1155, ERC2981)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
 }
