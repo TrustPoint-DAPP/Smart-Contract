@@ -16,9 +16,9 @@ contract DealController is Pausable, AccessControl, EIP712 {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant SIGNER_ROLE = keccak256("SIGNER_ROLE");
 
-    uint96 feeRoyaltyBasisPoints;
-    uint256 oneOffFeeBasisPoints;
-    address feeCollector;
+    uint96 public feeRoyaltyBasisPoints;
+    uint256 public oneOffFeeBasisPoints;
+    address public feeCollector;
 
     struct Deal {
         uint256 id;

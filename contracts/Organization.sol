@@ -16,7 +16,7 @@ contract OrganizationController is
     IOrganizationController
 {
     using ECDSA for bytes32;
-    Logger immutable logger;
+    Logger public immutable logger;
 
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant DEAL_MAKER_ROLE = keccak256("DEAL_MAKER_ROLE");
