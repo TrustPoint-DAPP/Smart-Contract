@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+import "./interfaces/IOrganizationController.sol";
 import "./NFT.sol";
-import "./IOrganizationController.sol";
 
 /// @custom:security-contact contact@yashgoyal.dev
 contract OrganizationController is

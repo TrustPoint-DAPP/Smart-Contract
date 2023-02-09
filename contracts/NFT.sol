@@ -8,6 +8,7 @@ import "./extensions/CustomERC1155Burnable.sol";
 import "./extensions/CustomERC1155Supply.sol";
 import "./extensions/CustomERC1155URIStorage.sol";
 import "./interfaces/IOrganizationController.sol";
+import "./interfaces/INFT.sol";
 import "./CustomERC1155.sol";
 import "./Logger.sol";
 
@@ -18,7 +19,8 @@ contract NFT is
     CustomERC1155Burnable,
     CustomERC1155Supply,
     CustomERC1155URIStorage,
-    ERC2981
+    ERC2981,
+    INFT
 {
     IOrganizationController public organizationController;
     uint256 public orgId;
@@ -135,7 +137,7 @@ contract NFT is
         public
         view
         virtual
-        override(CustomERC1155, ERC2981)
+        override(IERC165, CustomERC1155, ERC2981)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
