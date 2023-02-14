@@ -30,6 +30,8 @@ contract NFT is
     error Unauthorized();
     error NFTNotFound();
 
+    event PermanentURI(string _value, uint256 indexed _id);
+
     constructor(
         uint256 _orgId,
         address _dealMaker,
@@ -59,6 +61,7 @@ contract NFT is
         _setURI(tokenId, tokenURI);
         _setTokenRoyalty(tokenId, royaltyReceiver, royaltyBasisPoints);
         logger.emitURI(tokenURI, tokenId);
+        emit PermanentURI(tokenURI, tokenId);
     }
 
     function pause() public onlyOwner {
