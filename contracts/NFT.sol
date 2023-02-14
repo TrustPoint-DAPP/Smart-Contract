@@ -60,7 +60,6 @@ contract NFT is
         uint256 tokenId = totalTokenIds++;
         _setURI(tokenId, tokenURI);
         _setTokenRoyalty(tokenId, royaltyReceiver, royaltyBasisPoints);
-        logger.emitURI(tokenURI, tokenId);
         emit PermanentURI(tokenURI, tokenId);
     }
 
