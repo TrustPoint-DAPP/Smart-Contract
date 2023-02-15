@@ -16,7 +16,8 @@ interface IOrganizationController {
 
     event CreateOrganization(
         uint256 indexed orgId,
-        address indexed adminAddress
+        address indexed adminAddress,
+        address indexed nftContract
     );
     event AdminUpdated(
         uint256 indexed orgId,

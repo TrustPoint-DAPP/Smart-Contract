@@ -56,7 +56,7 @@ contract OrganizationController is
             nftContract: address(nftContract),
             isLocked: false
         });
-        emit CreateOrganization(orgId, admin);
+        emit CreateOrganization(orgId, admin, address(nftContract));
     }
 
     function getOrganization(uint256 id)
