@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
@@ -53,7 +53,21 @@ contract DealController is Pausable, AccessControl, EIP712 {
 
     IOrganizationController public organizationController;
 
-    event CreateOrganization(uint256 orgId, address adminAddress);
+    event DealCreated(Deal deal, NFT[] nfts);
+
+    event DealCancelled(
+        uint256 indexed dealId,
+        uint256 indexed organizationId,
+        address indexed counterParty
+    );
+    event DealCompleted(
+        uint256 indexed dealId,
+        uint256 indexed organizationId,
+        address indexed counterParty,
+        uint256[] nftIds,
+        uint256[] tokenIds,
+        address[] royaltyReceivers
+    );
 
     error InvalidNonce();
     error InvalidValue();
@@ -166,6 +180,11 @@ contract DealController is Pausable, AccessControl, EIP712 {
 
         // add the nft in deal
         nftsInDeal[dealId].push(nftId);
+
+        // emit the event
+        NFT[] memory nftObjs = new NFT[](1);
+        nftObjs[0] = nfts[nftId];
+        emit DealCreated(deals[dealId], nftObjs);
     }
 
     function acceptDeal(uint256 dealId, address royaltyReceiver) public {
@@ -190,6 +209,9 @@ contract DealController is Pausable, AccessControl, EIP712 {
         payees[1] = deal.orgRoyaltyReceiver;
         payees[2] = royaltyReceiver;
 
+        uint256[] memory tokenIds = new uint256[](deal.noOfNFTs);
+        address[] memory royaltyReceivers = new address[](deal.noOfNFTs);
+
         // create the nfts
         for (uint256 i = 0; i < deal.noOfNFTs; i++) {
             // fetch the nft struct
@@ -212,9 +234,13 @@ contract DealController is Pausable, AccessControl, EIP712 {
                 nft.orgRoyaltyBasisPoints +
                 nft.royaltyBasisPoints;
 
+            // update the arrays for event
+            tokenIds[nftId] = nftContract.totalTokenIds();
+            royaltyReceivers[nftId] = royaltyReceiver;
+
             // update the info on the nft struct
             nfts[nftId].royaltySplitter = royaltySplitter;
-            nfts[nftId].tokenId = nftContract.totalTokenIds();
+            nfts[nftId].tokenId = tokenIds[nftId];
             nfts[nftId].created = true;
 
             // create the nft on the nft contract
@@ -229,6 +255,15 @@ contract DealController is Pausable, AccessControl, EIP712 {
         uint256 fees = (deal.oneOffPayment * oneOffFeeBasisPoints) / 10000;
         _transferEther(feeCollector, fees);
         _transferEther(msg.sender, deal.oneOffPayment - fees);
+
+        emit DealCompleted(
+            dealId,
+            deal.orgId,
+            deal.counterParty,
+            nftsInDeal[dealId],
+            tokenIds,
+            royaltyReceivers
+        );
     }
 
     function cancelDeal(uint256 dealId) public {
@@ -246,6 +281,8 @@ contract DealController is Pausable, AccessControl, EIP712 {
 
         // transfer the amount back to the org admin
         _transferEther(msg.sender, deal.oneOffPayment);
+
+        emit DealCancelled(dealId, deal.orgId, deal.counterParty);
     }
 
     function dealExists(uint256 dealId) public view returns (bool) {

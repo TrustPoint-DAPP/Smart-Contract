@@ -12,6 +12,7 @@ import "./interfaces/INFT.sol";
 import "./CustomERC1155.sol";
 import "./Logger.sol";
 
+/// @custom:security-contact contact@yashgoyal.dev
 contract NFT is
     CustomERC1155,
     Ownable,

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+/// @custom:security-contact contact@yashgoyal.dev
 contract Logger {
     mapping(address => bool) public nftContracts;
 
