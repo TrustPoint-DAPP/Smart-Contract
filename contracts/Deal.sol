@@ -133,7 +133,7 @@ contract DealController is Pausable, AccessControl, EIP712 {
                     orgRoyaltyBasisPoints,
                     counterParty,
                     orgRoyaltyReceiver,
-                    keccak256(abi.encode(nftCID)),
+                    keccak256(abi.encodePacked((nftCID))),
                     nonce
                 )
             )

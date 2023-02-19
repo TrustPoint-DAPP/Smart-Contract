@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "./extensions/CustomERC1155Burnable.sol";
@@ -15,7 +14,6 @@ import "./Logger.sol";
 /// @custom:security-contact contact@yashgoyal.dev
 contract NFT is
     CustomERC1155,
-    Ownable,
     Pausable,
     CustomERC1155Burnable,
     CustomERC1155Supply,
@@ -30,7 +28,12 @@ contract NFT is
 
     error Unauthorized();
     error NFTNotFound();
+    address private _owner;
 
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
     event PermanentURI(string _value, uint256 indexed _id);
 
     constructor(
@@ -46,6 +49,11 @@ contract NFT is
             address(0),
             organizationController.getOrganization(_orgId).admin
         );
+    }
+
+    modifier onlyOwner() {
+        require(owner() == msg.sender, "Ownable: caller is not the owner");
+        _;
     }
 
     modifier onlyDealMaker() {
@@ -107,19 +115,27 @@ contract NFT is
 
     // overriding Ownable functions to use Organization Controller
 
-    function owner() public view virtual override returns (address) {
+    function owner() public view virtual returns (address) {
         if (organizationController.getOrganization(orgId).isLocked)
             return address(0);
         return organizationController.getOrganization(orgId).admin;
     }
 
-    function renounceOwnership() public virtual override onlyOwner {
+    function renounceOwnership() public virtual onlyOwner {
         address oldOwner = owner();
         organizationController.lockOrganization(orgId);
         emit OwnershipTransferred(oldOwner, address(0));
     }
 
-    function _transferOwnership(address newOwner) internal virtual override {
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
+        _transferOwnership(newOwner);
+    }
+
+    function _transferOwnership(address newOwner) internal virtual {
         address oldOwner = owner();
         organizationController.updateAdmin(orgId, newOwner);
         emit OwnershipTransferred(oldOwner, newOwner);

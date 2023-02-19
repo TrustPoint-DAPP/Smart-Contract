@@ -45,18 +45,20 @@ contract OrganizationController is
         if (exists(orgId)) revert OrganizationAlreadyExists();
         if (orgIdOf[admin] != 0) revert OneAdminCanHaveOnlyOneOrganization();
 
-        // deploy a nft contract for the organization
-        NFT nftContract = new NFT(orgId, msg.sender, logger);
-        logger.addNFTContract(address(nftContract));
-
         orgIdOf[admin] = orgId;
         organizations[orgId] = Organization({
             id: orgId,
             admin: admin,
-            nftContract: address(nftContract),
+            nftContract: address(0),
             isLocked: false
         });
-        emit CreateOrganization(orgId, admin, address(nftContract));
+
+        // deploy a nft contract for the organization
+        address nftContract = address(new NFT(orgId, msg.sender, logger));
+        logger.addNFTContract(nftContract);
+        organizations[orgId].nftContract = nftContract;
+
+        emit CreateOrganization(orgId, admin, nftContract);
     }
 
     function getOrganization(uint256 id)
