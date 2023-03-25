@@ -235,12 +235,12 @@ contract DealController is Pausable, AccessControl, EIP712 {
                 nft.royaltyBasisPoints;
 
             // update the arrays for event
-            tokenIds[nftId] = nftContract.totalTokenIds();
-            royaltyReceivers[nftId] = royaltyReceiver;
+            tokenIds[i] = nftContract.totalTokenIds();
+            royaltyReceivers[i] = royaltyReceiver;
 
             // update the info on the nft struct
             nfts[nftId].royaltySplitter = royaltySplitter;
-            nfts[nftId].tokenId = tokenIds[nftId];
+            nfts[nftId].tokenId = tokenIds[i];
             nfts[nftId].created = true;
 
             // create the nft on the nft contract
