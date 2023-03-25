@@ -24,21 +24,29 @@ async function main() {
     "DealController"
   );
   const LoggerFactory = await ethers.getContractFactory("Logger");
-  const organizationControllerABI = JSON.stringify(
-    OrganizationControllerFactory.interface.format()
+
+  const organizationControllerABI =
+    OrganizationControllerFactory.interface.format(
+      ethers.utils.FormatTypes.json
+    );
+
+  const nftABI = NFTFactory.interface.format(ethers.utils.FormatTypes.json);
+
+  const dealControllerABI = DealControllerFactory.interface.format(
+    ethers.utils.FormatTypes.json
   );
 
-  const nftABI = JSON.stringify(NFTFactory.interface.format());
-
-  const dealControllerABI = JSON.stringify(
-    DealControllerFactory.interface.format()
+  const loggerABI = LoggerFactory.interface.format(
+    ethers.utils.FormatTypes.json
   );
 
-  const loggerABI = JSON.stringify(LoggerFactory.interface.format());
-  saveABIFile("OrganizationController.json", organizationControllerABI);
-  saveABIFile("NFT.json", nftABI);
-  saveABIFile("DealController.json", dealControllerABI);
-  saveABIFile("Logger.json", loggerABI);
+  saveABIFile(
+    "OrganizationController.json",
+    organizationControllerABI as string
+  );
+  saveABIFile("NFT.json", nftABI as string);
+  saveABIFile("DealController.json", dealControllerABI as string);
+  saveABIFile("Logger.json", loggerABI as string);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
